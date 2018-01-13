@@ -1,0 +1,46 @@
+--PACKAGE DECLARATION
+
+CREATE OR REPLACE PACKAGE purchase_pack
+IS
+
+--FUNCTION DECLARATION
+
+ function item_check(b_no TEMP_PUR.bill_no%type) return varchar2;
+
+end;
+
+----PACKAGE BODY
+
+
+create or replace package body purchase_pack
+is
+
+--FUNCTION BODY
+
+function item_check(b_no TEMP_PUR.bill_no%type) return varchar2
+is
+item VARCHAR2(30);
+CNT NUMBER(4);
+IBN EXCEPTION;
+begin
+select COUNT(*) into CNT from  TEMP_PUR where bill_no=b_no;
+IF (CNT=0) THEN
+RAISE IBN;
+END IF;
+select count(*) into item from  TEMP_PUR where bill_no=b_no;
+return item;
+
+EXCEPTION
+when IBN then
+item:='INVALID BILL NO';
+RETURN item;
+WHEN OTHERS THEN
+item:='OTHER ERROR';
+RETURN item;
+end item_check;
+end purchase_pack;
+
+
+--FUNCTION TEST
+
+select purchase_pack.item_check('DM/JUL/16/100028') from dual;

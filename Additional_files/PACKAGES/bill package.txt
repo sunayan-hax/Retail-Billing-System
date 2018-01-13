@@ -1,0 +1,71 @@
+--PACKAGE DECLARATION
+
+
+CREATE OR REPLACE PACKAGE bill_pack
+IS
+
+--PROCEDURE DECLARATION
+
+ procedure stock_update(bno temp_pur.bill_no%type,PID temp_pur.p_id%type,new_entry temp_pur.quantity%type);
+
+--FUNCTION DECLARATION
+
+FUNCTION bill_insert(bid bill.b_id%type,uoname bill.O_U_NAME%type,bdate bill.B_DATE%type,btime bill.B_TIME%type,btotal bill.B_TOTAL%type,bda bill.DISCOUNT_AMT%type,bva bill.VAT_AMT%type,bnt bill.NET_TOTAL%type) RETURN VARCHAR2;
+end;
+
+--PACKAGE BODY
+
+create or replace package body bill_pack
+is
+
+--PROCEDURE BODY
+
+procedure stock_update(bno temp_pur.bill_no%type,PID temp_pur.p_id%type,new_entry temp_pur.quantity%type)
+is
+
+begin
+update temp_pur set QUANTITY=QUANTITY+new_entry where (p_id=pid) AND (bill_no=bno);
+standard.commit;
+end stock_update;
+
+
+--FUNCTION BODY
+
+
+FUNCTION bill_insert(bid bill.b_id%type,uoname bill.O_U_NAME%type,bdate bill.B_DATE%type,btime bill.B_TIME%type,btotal bill.B_TOTAL%type,bda bill.DISCOUNT_AMT%type,bva bill.VAT_AMT%type,bnt bill.NET_TOTAL%type) RETURN VARCHAR2
+is
+RET VARCHAR2(225);
+cnt integer;
+ION EXCEPTION;
+begin
+select count(*) into cnt from user_account where user_name=uoname;
+if (cnt=0) then
+raise ION;
+end if;
+insert into bill (B_ID,O_U_NAME,B_DATE,B_TIME,B_TOTAL,DISCOUNT_AMT,VAT_AMT,NET_TOTAL) values ('DM/JUL/16/100045','keshav_delhi',to_date(sysdate,'dd-mm-yyyy'),'7:23:05',899,25,46,700);
+standard.commit;
+RET:='DONE';
+RETURN RET;
+EXCEPTION
+when ION then
+RET:='INVALID OPERATOR';
+RETURN RET;
+
+END bill_insert;
+end bill_pack;
+
+--PROCEDURE TEST
+
+declare
+begin
+bill_pack.stock_update('ABC-100019','AVG-178',2);
+end;
+
+
+--FUNCTION TEST
+
+declare
+x varchar2(100);
+begin
+x:=bill_pack1.bill_insert('DM/JUL/16/100068/JUL/16/100054','RAH128',to_date(sysdate,'dd-mm-yyyy'),'2:26:05',339,85,46,700);
+end;

@@ -1,0 +1,52 @@
+TABLES AND COLUMNS
+
+**********************************************************************
+create table product(
+p_id varchar(20) primary key not null,
+p_name char(40) not null,
+p_price number(10,2) not null,
+p_discount int,
+p_mfg_date date not null,
+p_exp_date date not null,
+p_stock int not null,
+p_desc varchar2(255),
+);
+----------------------------------------------------------------------
+create table bill(
+b_id varchar(20) primary key not null,
+o_u_name varchar(20) not null,
+b_date date not null,
+b_time date not null,
+b_total number(10,2) not null,
+discount_amt number(10,2),
+VAT_amt number(10,2) not null,
+net_total number(10,2) not null,
+foreign key(o_u_name) references user_account(user_name) on delete cascade 
+);
+
+----------------------------------------------------------------------
+create table user_account(
+user_name varchar(20) primary key not null,
+name varchar(20) not null,
+password varchar2(20) not null,
+role varchar2(20) not null
+);
+----------------------------------------------------------------------
+create table temp_pur
+(
+bill_no varchar2(255),
+p_id varchar2(255),
+quantity int);
+-------------------------------------------------------------------------
+create table per_pur
+(
+bill_no varchar2(255),
+p_id varchar2(255),
+quantity int);
+--------------------------------------------------------------------------
+create table summary(
+filter_sum varchar(20));
+
+insert into summary values('DAILY');
+insert into summary values('MONTHLY');
+insert into summary values('YEARLY');

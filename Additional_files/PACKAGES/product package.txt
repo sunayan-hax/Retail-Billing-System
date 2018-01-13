@@ -1,0 +1,95 @@
+
+
+CREATE OR REPLACE PACKAGE product_pack
+IS
+ function stock_check(PID product.P_ID%type) return varchar2;
+ function rate_check(PID product.P_ID%type) return varchar2;
+ function dis_check(PID product.P_ID%type) return varchar2;
+ procedure stock_update(PID product.P_ID%type,new_entry product.P_STOCK%type);
+end;
+
+create or replace package body product_pack
+is
+
+function stock_check(PID product.P_ID%type) return varchar2
+is
+avl VARCHAR2(30);
+CNT NUMBER(4);
+IPID EXCEPTION;
+begin
+select COUNT(*) into CNT from  product where p_id=pid;
+IF (CNT=0) THEN
+RAISE IPID;
+END IF;
+select P_stock into avl from  product where p_id=pid;
+return avl;
+
+EXCEPTION
+when IPID then
+avl:='INVALID PRODUCT ID';
+RETURN avl;
+WHEN OTHERS THEN
+avl:='OTHER ERROR';
+RETURN avl;
+end stock_check;
+
+
+function dis_check(PID product.P_ID%type) return varchar2
+is
+pdis VARCHAR2(30);
+IPID EXCEPTION;
+CNT NUMBER(4);
+begin
+select COUNT(*) into CNT from  product where p_id=pid;
+IF (CNT=0) THEN
+RAISE IPID;
+END IF;
+select P_DISCOUNT into pdis from  product where p_id=pid;
+return pdis;
+EXCEPTION
+when IPID then
+pdis:='INVALID PRODUCT ID';
+RETURN pdis;
+WHEN OTHERS THEN
+pdis:='OTHER ERROR';
+RETURN pdis;
+end dis_check;
+
+
+
+function rate_check(PID product.P_ID%type) return varchar2
+is
+rate VARCHAR2(30);
+IPID EXCEPTION;
+CNT NUMBER(4);
+begin
+select COUNT(*) into CNT from  product where p_id=pid;
+IF (CNT=0) THEN
+RAISE IPID;
+END IF;
+select (P_PRICE-P_DISCOUNT) into rate from  product where p_id=pid;
+return rate;
+EXCEPTION
+when IPID then
+rate:='INVALID PRODUCT ID';
+RETURN rate;
+WHEN OTHERS THEN
+rate:='OTHER ERROR';
+RETURN rate;
+end rate_check;
+
+
+procedure stock_update(PID product.P_ID%type,new_entry product.P_STOCK%type)
+is
+
+begin
+update product set p_stock=p_stock+new_entry where p_id=pid;
+standard.commit;
+end stock_update;
+
+
+end product_pack;
+
+
+
+

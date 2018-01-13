@@ -1,0 +1,55 @@
+CREATE OR REPLACE PACKAGE account_pack
+IS
+ function type_check(un user_account.user_name%type,pwd user_account.password%type) return varchar2;
+ function name_check(un user_account.user_name%type) return varchar2;
+end;
+
+create or replace package body account_pack
+is 
+ function type_check(un user_account.user_name%type,pwd user_account.password%type) return varchar2
+is
+type1 user_account.role%type;
+CNT INTEGER;
+UNF EXCEPTION;
+begin
+SELECT COUNT(*) INTO CNT FROM user_account WHERE (user_name=un) AND (password=pwd);
+IF(CNT=0)THEN
+	RAISE UNF;
+END IF;
+select role into type1 from  user_account where (user_name=un) AND (password=pwd);
+return type1;
+EXCEPTION
+WHEN UNF THEN
+type1:='INVALID';
+RETURN type1;
+WHEN OTHERS THEN
+type1:='ERR';
+RETURN type1;
+end type_check;
+
+
+function name_check(un user_account.user_name%type) return varchar2
+is
+nme user_account.name%type;
+CNT INTEGER;
+UNF EXCEPTION;
+begin
+SELECT COUNT(*) INTO CNT FROM user_account WHERE user_name=un;
+IF(CNT=0)THEN
+	RAISE UNF;
+END IF;
+select name into nme from  user_account where user_name=un;
+return nme;
+EXCEPTION
+WHEN UNF THEN
+nme:='INVALID';
+RETURN nme;
+WHEN OTHERS THEN
+nme:='ERR';
+RETURN nme;
+end name_check;
+end account_pack;
+
+
+select account_pack.type_check('sid102030','dba') from dual;
+select account_pack.name_check('govind987') from dual;
